@@ -1,0 +1,38 @@
+
+{% extends "guestbook/views/templates/base.html" %}
+{% block content %}
+  <ul>
+    {% for item in messages %}
+      <li>
+        <time>{{item.timestamp|date:"yyyy-MM-dd HH:mm"}}</time>
+        <p>{{item.message}}</p>
+        <p>{{item.name}}</p>
+      </li>
+    {% endfor %}
+  </li>
+
+  {% if error %}
+    <p>{{error}}</p>
+  {% endif %}
+
+  <form action="/" method="POST">
+    <p>
+      Name:
+      <input type=text" name="name" value="{{name}}" id="name">
+    </p>
+    <p>
+      Messages:
+      <textarea rows="4" cols="50" name="message" id="message">{{message}}</textarea>
+    </p>
+    <input type="submit" value="comment">
+  </form>
+
+  <input type="button" id="btn-test" name="test" value="test">
+  <input type="button" id="btn-send" name="send" value="send">
+
+  <script type="text/javascript" charset="utf-8">
+    guestbook.testing.init();
+  </script>
+{% endblock %}
+
+
