@@ -3,7 +3,8 @@
   (:require [guestbook.views.layout :as layout]
             [guestbook.util :as util]
             [guestbook.models.db :as db]
-            [noir.response :as response]))
+            [noir.response :as response]
+            [guestbook.message.validators :refer [validate-model]]))
 
 (defn home-page [& [name message error]]
   (layout/render "home.html"
@@ -13,14 +14,8 @@
                   :messages (db/get-messages)}))
 
 (defn save-message [name message]
-  (cond 
-
-    (empty? name)
-    (home-page name message "Somebody forgot to leave a name")
-    
-    (empty? message)
-    (home-page name message "Dont you have anything to say?")
-    :else
+  (if-let [errors (validate-model name message)]
+    (home-page name message errors)
     (do
       (db/save-message name message)
       (home-page))))

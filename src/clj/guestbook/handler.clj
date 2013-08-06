@@ -1,11 +1,13 @@
 (ns guestbook.handler  
   (:require [compojure.core :refer [defroutes]]            
-            [guestbook.routes.home :refer [home-routes]]
-            [noir.util.middleware :as middleware]
             [compojure.route :as route]
+            [compojure.handler :as handler]
+            [noir.util.middleware :as middleware]
             [taoensso.timbre :as timbre]
             [com.postspectacular.rotor :as rotor]
-            [guestbook.models.schema :as schema]))
+            [guestbook.routes.home :refer [home-routes]]
+            [guestbook.models.schema :as schema]
+            [shoreleave.middleware.rpc :refer [wrap-rpc defremote remote-ns]]))
 
 (defroutes app-routes
   (route/resources "/")
@@ -43,13 +45,15 @@
   []
   (timbre/info "guestbook is shutting down..."))
 
+(remote-ns 'guestbook.message.api :as "api")
 (def app (middleware/app-handler
            ;;add your application routes here
            [home-routes app-routes]
            ;;add custom middleware here           
-           :middleware []
+           :middleware [wrap-rpc handler/site]
            ;;add access rules here
            ;;each rule should be a vector
            :access-rules []))
 
 (def war-handler (middleware/war-handler app))
+
